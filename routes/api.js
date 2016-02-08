@@ -37,10 +37,11 @@ router.route("/users/auth")
             }
         })
     })
+
 router.route("/profiles")
     .get(function(req, res, next) {
         console.log("retrieving profiles...");
-        Profile.find({}, function(err, profiles) {
+        Profile.find({}).populate("user").exec(function(err, profiles) {
             if(err) return res.send(err);
             res.json(profiles);
         })
