@@ -4,10 +4,12 @@ var mongoose = require("mongoose");
 mongoose.connect('mongodb://chaos:chaosapp@/opt/bitnami/mongodb/tmp/mongodb-27017.sock:27017/chaosdb');
 //mongoose.connect('mongodb://localhost:27017/chaosdb');
 var User = require("../models/user");
+var Profile = require("../models/profile");
 
 /* GET home page. */
 router.route("/users")
     .get(function(req, res, next) {
+        console.log("HEY");
         User.find({}, function(err, users) {
             if(err) return res.send(err);
             res.json(users);
@@ -41,7 +43,7 @@ router.route("/users/:id")
 })
 router.route("/users/auth")
     .post(function(req, res, next) {
-        User.find({username : req.body.username}, function(err, users) {
+        User.find({username : req.body.username, password : req.body.password}, function(err, users) {
             if(err) return res.send(err);
             if(users.length == 1) {
                 res.json({result : 1});
@@ -50,5 +52,26 @@ router.route("/users/auth")
             }
         })
     })
+
+router.route("/profiles")
+    .get(function(req, res, next) {
+        console.log("retrieving profiles...");
+        Profile.find({}).populate("user").exec(function(err, profiles) {
+            if(err) return res.send(err);
+            res.json(profiles);
+        })
+    })
+    .post(function(req, res, next) {
+        Profile.create({name : req.body.name, description : req.body.description, user: req.body.user_id}, function (err, profile) {
+            if(err) return res.send(err);
+            res.json(profile);
+        })
+    })
+    .delete(function(req, res, next) {
+        Profile.remove({_id : req.body.id}, function(err) {
+            if(err) return res.send(err);
+            res.send("Removed");
+        })
+    });
 
 module.exports = router;
