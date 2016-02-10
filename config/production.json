@@ -1,0 +1,3 @@
+{
+  "dbConnection": "mongodb://chaos:chaosapp@/opt/bitnami/mongodb/tmp/mongodb-27017.sock:27017/chaosdb"
+}
