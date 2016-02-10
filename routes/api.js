@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require("mongoose");
-mongoose.connect('mongodb://chaos:chaosapp@/opt/bitnami/mongodb/tmp/mongodb-27017.sock:27017/chaosdb');
-//mongoose.connect('mongodb://localhost:27017/chaosdb');
+//mongoose.connect('mongodb://chaos:chaosapp@/opt/bitnami/mongodb/tmp/mongodb-27017.sock:27017/chaosdb');
+mongoose.connect('mongodb://localhost:27017/chaosdb');
 var User = require("../models/user");
 var Profile = require("../models/profile");
 
