@@ -5,8 +5,15 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+// Sets uo mongoose connection
+var config = require('config');
+var mongoose = require('mongoose');
+mongoose.connect(config.get("dbConnection"));
+
 var routes = require('./routes/index');
-var api = require('./routes/api');
+var profiles = require('./routes/api/profiles');
+var users = require('./routes/api/users');
+var matches = require('./routes/api/matches');
 
 var app = express();
 
@@ -23,8 +30,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/api', api);
 app.use('/sockets', require("./routes/sockets"));
+app.use('/api/profiles', profiles);
+app.use('/api/users', users);
+app.use('/api/matches', matches);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
