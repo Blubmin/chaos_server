@@ -16,4 +16,9 @@ router.route("/")
         });
     });
 
+router.route("/findAvailableMatches")
+    .post(function(req, res) {
+        console.log("finding available matches...");
+
+    });
 module.exports = router;

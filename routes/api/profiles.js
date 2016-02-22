@@ -5,12 +5,14 @@ var express = require("express"),
     router = express.Router(),
     root = require("root-path");
 
-var Profile = require(root("models/profile"))
+var Profile = require(root("models/profile")),
+    Match = require(root("models/match"));
 
 router.route("/")
     .get(function(req, res, next) {
         console.log("retrieving profiles...");
-        Profile.find({}).populate("user").exec(function(err, profiles) {
+        console.log(req.query);
+        Profile.find(req.query).populate("user").exec(function(err, profiles) {
             if(err) return res.send(err);
             res.json(profiles);
         })
@@ -28,4 +30,8 @@ router.route("/")
         })
     });
 
+router.route("/findAvailableProfile")
+    .post(function(res, res) {
+
+    });
 module.exports = router;
