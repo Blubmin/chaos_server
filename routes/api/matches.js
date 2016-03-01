@@ -6,7 +6,7 @@ var express = require("express"),
     root = require("root-path");
 
 var Match = require(root("models/match")),
-    Profile = require(root("models/profile"));
+    User = require(root("models/user"));
 
 router.route("/")
     .get(function(req, res, next) {
@@ -17,44 +17,68 @@ router.route("/")
         });
     });
 
+
+// Gets a random unmatched user
+router.route("/:userID")
+    .get(function(req, res) {
+        User.findOne({user: req.params.userID}).populate("profile.matches").exec(function(err, user) {
+            if(err) return res.send(err);
+
+            var matchArray = [];
+
+            user.profile.matches.forEach(function(match) {
+                if (matchArray.indexOf(match.user1) != -1)
+                    matchArray.push(match.user2);
+                if (matchArray.indexOf(match.user1) != -1)
+                    matchArray.push(match.user2);
+            });
+
+            if(matchArray.indexOf(user._id) == -1)
+                matchArray.push(user._id);
+
+            User.findRandom({ _id : { $nin : matchArray}}, {}, {limit : 1}).exec(function(err, unmatchedUser) {
+                if (err) return res.send(err);
+                res.json(unmatchedUser[0]);
+            });
+        });
+    });
+
 // TODO: Somewhere in here is where you let both parties know that there's a valid match
-router.route("/addMatchPreference")
+router.route("/:userID/preference")
     .post(function(req, res, next) {
-
-        var userIds = [req.body.profile1, req.body.profile2];
-
-        Match.findOne({ profile1 : { $in : userIds }, profile2 : { $in : userIds }}).exec(function(err, match){
+        var userIds = [req.params.userID, req.body.otherUserID];
+        Match.findOne({ user1 : { $in : userIds }, user2 : { $in : userIds }}).exec(function(err, match){
             if(err) return res.send(err);
 
             if(match) {
-                if (match.profile1 == req.body.profile1)
+                if (match.user1 == req.params.userID)
                     match.preference1 = req.body.preference;
                 else
                     match.preference2 = req.body.preference;
                 match.save();
 
-                Profile.findOne({_id : req.body.profile1}).exec(function(err, profile) {
+                User.findOne({_id : req.params.userID}).exec(function(err, user) {
                     if (err) return res.send(err);
 
-                    profile.matches.push(match);
-                    profile.save();
+                    user.profile.matches.push(match);
+                    user.save();
 
                     return res.json(match);
                 });
             }
             else {
                 Match.create({
-                    profile1: req.body.profile1,
-                    profile2: req.body.profile2,
+                    user: req.params.userID,
+                    user: req.body.otherUserID,
                     preference1: req.body.preference
                 }, function(err, match) {
                     if(err) return res.send(err);
 
-                    Profile.findOne({_id : req.body.profile1}).exec(function(err, profile) {
+                    User.findOne({_id : req.params.userID}).exec(function(err, user) {
                         if (err) return res.send(err);
 
-                        profile.matches.push(match);
-                        profile.save();
+                        user.profile.matches.push(match);
+                        user.save();
 
                         return res.json(match);
                     });

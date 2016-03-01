@@ -19,10 +19,8 @@ router.route("/")
     .post(function(req, res, next) {
         User.create({
             facebook_id : req.body.facebook_id,
-            first_name : req.body.first_name,
-            last_name : req.body.last_name,
-            gender : req.body.gender,
-            email : req.body.email
+            email: req.body.email,
+            profile : req.body.profile
         }, function (err, user) {
             if(err) return res.send(err);
             return res.json(user);
@@ -42,16 +40,18 @@ router.route("/:id")
             return res.json(user)
         })
     })
-router.route("/auth")
+
+// for testing, mainly
+router.route("/:id/clearMatches")
     .post(function(req, res, next) {
-        User.find({username : req.body.username, password : req.body.password}, function(err, users) {
-            if(err) return res.send(err);
-            if(users.length == 1) {
-                res.json({result : 1});
-            } else {
-                res.json({result : 0});
-            }
+        Profile.findById(req.body.id, function(err, profile) {
+            if (err) return res.send(err);
+
+            profile.matches = [];
+            profile.save();
+
+            return res.json(profile);
         })
-    })
+    });
 
 module.exports = router;
