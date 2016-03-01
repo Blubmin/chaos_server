@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 // Sets uo mongoose connection
 var config = require('config');
 var mongoose = require('mongoose');
+
 mongoose.connect(config.get("dbConnection"));
 
 var routes = require('./routes/index');
