@@ -21,20 +21,23 @@ router.route("/")
 // Gets a random unmatched user
 router.route("/:userID")
     .get(function(req, res) {
-        User.findOne({user: req.params.userID}).populate("profile.matches").exec(function(err, user) {
+        User.findOne({_id: req.params.userID}).populate("profile.matches").exec(function(err, user) {
             if(err) return res.send(err);
+            if(!user) return res.json(user);
 
             var matchArray = [];
 
             user.profile.matches.forEach(function(match) {
-                if (matchArray.indexOf(match.user1) != -1)
-                    matchArray.push(match.user2);
-                if (matchArray.indexOf(match.user1) != -1)
+                if (matchArray.indexOf(match.user1) == -1)
+                    matchArray.push(match.user1);
+                if (matchArray.indexOf(match.user2) == -1)
                     matchArray.push(match.user2);
             });
 
             if(matchArray.indexOf(user._id) == -1)
                 matchArray.push(user._id);
+
+            console.log(matchArray);
 
             User.findRandom({ _id : { $nin : matchArray}}, {}, {limit : 1}).exec(function(err, unmatchedUser) {
                 if (err) return res.send(err);
@@ -68,8 +71,8 @@ router.route("/:userID/preference")
             }
             else {
                 Match.create({
-                    user: req.params.userID,
-                    user: req.body.otherUserID,
+                    user1: req.params.userID,
+                    user2: req.body.otherUserID,
                     preference1: req.body.preference
                 }, function(err, match) {
                     if(err) return res.send(err);
