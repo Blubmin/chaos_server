@@ -12,7 +12,6 @@ var mongoose = require('mongoose');
 mongoose.connect(config.get("dbConnection"));
 
 var routes = require('./routes/index');
-var profiles = require('./routes/api/profiles');
 var users = require('./routes/api/users');
 var matches = require('./routes/api/matches');
 var conversations = require("./routes/api/conversations")
@@ -33,7 +32,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/sockets', require("./routes/sockets"));
-app.use('/api/profiles', profiles);
 app.use('/api/users', users);
 app.use('/api/conversations', conversations);
 app.use('/api/matches', matches);

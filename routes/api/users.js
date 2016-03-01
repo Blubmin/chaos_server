@@ -19,10 +19,8 @@ router.route("/")
     .post(function(req, res, next) {
         User.create({
             facebook_id : req.body.facebook_id,
-            first_name : req.body.first_name,
-            last_name : req.body.last_name,
-            gender : req.body.gender,
-            email : req.body.email
+            email: req.body.email,
+            profile : req.body.profile
         }, function (err, user) {
             if(err) return res.send(err);
             return res.json(user);
@@ -35,6 +33,7 @@ router.route("/")
         })
     });
 
+
 router.route("/:id")
     .get(function(req, res, next) {
         User.findOne({facebook_id : req.params.id}, function(err, user) {
@@ -42,16 +41,56 @@ router.route("/:id")
             return res.json(user)
         })
     })
-router.route("/auth")
-    .post(function(req, res, next) {
-        User.find({username : req.body.username, password : req.body.password}, function(err, users) {
-            if(err) return res.send(err);
-            if(users.length == 1) {
-                res.json({result : 1});
-            } else {
-                res.json({result : 0});
+    .put(function(req, res, next) {
+        console.log(req);
+        User.findOne({facebook_id : req.params.id}, function(err, user) {
+            if (err) return res.send(err);
+            if (!user) return res.json(user);
+
+            if (req.body.email)
+                user.email = req.body.email;
+            if (req.body.profile) {
+                if (req.body.profile.first_name)
+                    user.profile.first_name = req.body.profile.first_name;
+                if (req.body.profile.last_name)
+                    user.profile.last_name = req.body.profile.last_name;
+                if (req.body.profile.age)
+                    user.profile.age = req.body.profile.age;
+                if (req.body.profile.description)
+                    user.profile.description = req.body.profile.description;
+                if (req.body.profile.gender)
+                    user.profile.gender = req.body.profile.gender;
+                if (req.body.profile.photos)
+                    user.profile.photos = req.body.profile.photos;
             }
+
+            user.save();
+
+            return res.json(user);
+        });
+    });
+
+router.route("/:id/photos")
+    .post(function(req, res, next) {
+        User.findById(req.params.id, function(err, user) {
+            if (err) return res.send(err);
+            user.profile.photos.push(req.body.photo);
+            user.save();
+            return res.json(user);
         })
-    })
+    });
+
+// for testing, mainly
+router.route("/:id/matches")
+    .delete(function(req, res, next) {
+        User.findById(req.params.id, function(err, user) {
+            if (err) return res.send(err);
+
+            user.profile.matches = [];
+            user.save();
+
+            return res.json(user);
+        })
+    });
 
 module.exports = router;
