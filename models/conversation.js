@@ -18,11 +18,11 @@ var conversationSchema = new Schema({
 });
 
 conversationSchema.statics.getConversationByUser = function(userID, cb) {
-    return this.find({}).select("participants last_updated").where("participants").in([userID]).sort({last_updated : 1}).populate("participants", "profile.first_name").exec(cb);
+    return this.find({}).select({participants : 1, last_updated : 1, messages : {"$slice" : -1}}).where("participants").in([userID]).sort({last_updated : 1}).populate("participants", "profile.first_name").exec(cb);
 }
 
 conversationSchema.statics.getMessagesByConvoID = function(convoID, cb) {
-    return this.findOne({"_id" : convoID}).select("messages").sort({time : 1}).exec(cb);
+    return this.findOne({"_id" : convoID}).populate("messages.user", "profile.first_name profile.last_name").select("messages").sort({time : 1}).exec(cb);
 }
 
 conversationSchema.methods.addMessage = function(message, userID, cb) {
