@@ -6,7 +6,8 @@ var express = require("express"),
     root = require("root-path");
 
 var Match = require(root("models/match")),
-    User = require(root("models/user"));
+    User = require(root("models/user")),
+    Conversation  = require(root("models/conversation"));
 
 router.route("/")
     .get(function(req, res, next) {
@@ -65,6 +66,12 @@ router.route("/:userID/preference")
 
                     user.profile.matches.push(match);
                     user.save();
+
+                    if (match.preference1 && match.preference2) {
+                        Conversation.create({
+                            participants : [match.user1, match.user2]
+                        });
+                    }
 
                     return res.json(match);
                 });
