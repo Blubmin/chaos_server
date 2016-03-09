@@ -26,6 +26,20 @@ router.route('/')
 
 router.route("/:id/messages")
     .get(function(req, res, next) {
+        Conversation.getMessagesByConvoID(req.params.id, function(err, messages) {
+            if(err) return res.send(err);
+            return res.json(messages);
+        })
+    })
+    .post(function(req, res, next) {
+        var message = req.body.message;
+        var userID = req.body.userID;
+        Conversation.findOne({"_id" : req.params.id}, function(err, convo) {
+            convo.addMessage(message, userID, function(err2) {
+                if(err2) return res.send(err2);
+                return res.json({"result" : "message added"});
+            })
+        })
 
     })
 
