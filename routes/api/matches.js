@@ -68,8 +68,15 @@ router.route("/:userID/preference")
                     user.save();
 
                     if (match.preference1 && match.preference2) {
-                        Conversation.create({
-                            participants : [match.user1, match.user2]
+
+                        Conversation.find({participants : {$in : userIds}}).exec(function(err, conversation) {
+                            if (err) return res.send(err);
+
+                            if (!conversation) {
+                                Conversation.create({
+                                    participants: userIds
+                                });
+                            }
                         });
                     }
 
