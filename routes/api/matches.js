@@ -69,7 +69,7 @@ router.route("/:userID/preference")
 
                     if (match.preference1 && match.preference2) {
 
-                        Conversation.findOne({participants : {$in : userIds}}).exec(function(err, conversation) {
+                        Conversation.findOne({participants : {$all : userIds}}).exec(function(err, conversation) {
                             if (err) return res.send(err);
 
                             if (!conversation) {
