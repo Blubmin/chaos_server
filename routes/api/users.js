@@ -78,6 +78,14 @@ router.route("/:id/photos")
             user.save();
             return res.json(user);
         })
+    })
+    .delete(function(req, res) {
+        User.findById(req.params.id, function(err, user) {
+            if (err) return res.send(err);
+            user.profile.photos.splice(user.profile.photos.indexOf(req.body.photo), 1);
+            user.save();
+            return res.json(user);
+        })
     });
 
 // for testing, mainly
