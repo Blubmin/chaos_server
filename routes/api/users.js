@@ -64,9 +64,9 @@ router.route("/:id")
                     user.profile.photos = req.body.profile.photos;
             }
 
-            user.save();
-
-            return res.json(user);
+            user.save(function(err) {
+                return res.json(user);
+            });
         });
     });
 
@@ -75,16 +75,18 @@ router.route("/:id/photos")
         User.findById(req.params.id, function(err, user) {
             if (err) return res.send(err);
             user.profile.photos.push(req.body.photo);
-            user.save();
-            return res.json(user);
+            user.save(function(err) {
+                return res.json(user);
+            });
         })
     })
     .delete(function(req, res) {
         User.findById(req.params.id, function(err, user) {
             if (err) return res.send(err);
             user.profile.photos.splice(user.profile.photos.indexOf(req.body.photo), 1);
-            user.save();
-            return res.json(user);
+            user.save(function(err) {
+                return res.json(user);
+            });
         })
     });
 
@@ -95,9 +97,9 @@ router.route("/:id/matches")
             if (err) return res.send(err);
 
             user.profile.matches = [];
-            user.save();
-
-            return res.json(user);
+            user.save(function(err) {
+                return res.json(user);
+            });
         })
     });
 
