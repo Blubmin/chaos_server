@@ -39,11 +39,10 @@ router.route("/:ted/:barney")
         });
     })
     .delete(function(req, res, next) {
-        Match.find({ ted: req.params.ted, barney: req.params.barney }).exec(function(err, matches) {
+        Match.find({ ted: req.params.ted, barney: req.params.barney }).remove(function(err){
             if (err) return res.send(err);
-            matches.remove();
-            return;
-        });
+            return res.json();
+        })
     });
 
 
@@ -74,10 +73,33 @@ router.route("/:ted/:barney/:robin")
             if(match)
             {
                 match.preference = req.body.preference;
-                match.save();
-                if (match.preference)
-                    startConversation(match);
-                return res.json(match);
+                match.save(function(err) {
+                    if (err) return ses.send(err);
+                });
+
+                User.findOne({_id : req.params.userID}).exec(function(err, user) {
+                    if (err) return res.send(err);
+
+                    user.profile.matches.push(match);
+                    user.save(function(err) {
+                        if (err) return res.send(err);
+                    });
+
+                    if (match.preference1 && match.preference2) {
+
+                        Conversation.findOne({participants : {$all : userIds}}).exec(function(err, conversation) {
+                            if (err) return res.send(err);
+
+                            if (!conversation) {
+                                Conversation.create({
+                                    participants: userIds
+                                });
+                            }
+                        });
+                    }
+
+                    return res.json(match);
+                });
             }
 
             Match.create({
