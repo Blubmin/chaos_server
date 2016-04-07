@@ -80,17 +80,4 @@ router.route("/:id/photos")
         })
     });
 
-// for testing, mainly
-router.route("/:id/matches")
-    .delete(function(req, res, next) {
-        User.findById(req.params.id, function(err, user) {
-            if (err) return res.send(err);
-
-            user.profile.matches = [];
-            user.save();
-
-            return res.json(user);
-        })
-    });
-
 module.exports = router;

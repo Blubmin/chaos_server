@@ -5,10 +5,10 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var matchSchema = new Schema({
-    user1: { type: Schema.Types.ObjectId, ref: 'User'},
-    user2: { type: Schema.Types.ObjectId, ref: 'User'},
-    preference1: Boolean,
-    preference2: Boolean
+    ted: { type: Schema.Types.ObjectId, ref: 'User'},
+    barney: { type: Schema.Types.ObjectId, ref: 'User'},
+    robin: { type: Schema.Types.ObjectId, ref: 'User'},
+    preference: Boolean
 });
 
 var Match = mongoose.model('Match', matchSchema);

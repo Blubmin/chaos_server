@@ -16,7 +16,7 @@ var userSchema = new Schema({
         age: Schema.Types.Number,
         gender: { type: String, enum: ["male", "female"]},
         photos: [{ type: String }],
-        matches: [{ type: Schema.Types.ObjectId, ref: 'Match'}]
+        wingmen: [{type: Schema.Types.ObjectId, ref: 'User'}]
     }
 });
 // Adds in the ability to query for a random profile

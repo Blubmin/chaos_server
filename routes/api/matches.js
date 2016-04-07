@@ -20,87 +20,77 @@ router.route("/")
 
 
 // Gets a random unmatched user
-router.route("/:userID")
-    .get(function(req, res) {
-        User.findOne({_id: req.params.userID}).populate("profile.matches").exec(function(err, user) {
+router.route("/:ted/:barney")
+    .get(function(req, res, next) {
+        Match.find({ ted: req.params.ted, barney: req.params.barney }).exec(function(err, matches) {
             if(err) return res.send(err);
-            if(!user) return res.json(user);
 
-            var matchArray = [];
-
-            user.profile.matches.forEach(function(match) {
-                if (matchArray.indexOf(match.user1) == -1)
-                    matchArray.push(match.user1);
-                if (matchArray.indexOf(match.user2) == -1)
-                    matchArray.push(match.user2);
+            var robins = [];
+            matches.forEach(function(match) {
+                robins.push(match.robin);
             });
+            robins.push(req.params.barney);
+            robins.push(req.params.ted);
 
-            if(matchArray.indexOf(user._id) == -1)
-                matchArray.push(user._id);
-
-            console.log(matchArray);
-
-            User.findRandom({ _id : { $nin : matchArray}}, {}, {limit : 1}).exec(function(err, unmatchedUser) {
+            User.findRandom({ _id : { $nin : robins}}, {}, {limit : 1}).exec(function(err, unmatchedUser) {
                 if (err) return res.send(err);
                 res.json(unmatchedUser[0]);
             });
         });
+    })
+    .delete(function(req, res, next) {
+        Match.find({ ted: req.params.ted, barney: req.params.barney }).exec(function(err, matches) {
+            if (err) return res.send(err);
+            matches.remove();
+            return;
+        });
     });
 
-// TODO: Somewhere in here is where you let both parties know that there's a valid match
-router.route("/:userID/preference")
-    .post(function(req, res, next) {
-        var userIds = [req.params.userID, req.body.otherUserID];
-        Match.findOne({ user1 : { $in : userIds }, user2 : { $in : userIds }}).exec(function(err, match){
-            if(err) return res.send(err);
 
-            if(match) {
-                if (match.user1 == req.params.userID)
-                    match.preference1 = req.body.preference;
-                else
-                    match.preference2 = req.body.preference;
-                match.save();
-
-                User.findOne({_id : req.params.userID}).exec(function(err, user) {
-                    if (err) return res.send(err);
-
-                    user.profile.matches.push(match);
-                    user.save();
-
-                    if (match.preference1 && match.preference2) {
-
-                        Conversation.findOne({participants : {$in : userIds}}).exec(function(err, conversation) {
-                            if (err) return res.send(err);
-
-                            if (!conversation) {
-                                Conversation.create({
-                                    participants: userIds
-                                });
-                            }
-                        });
-                    }
-
-                    return res.json(match);
-                });
-            }
-            else {
-                Match.create({
-                    user1: req.params.userID,
-                    user2: req.body.otherUserID,
-                    preference1: req.body.preference
-                }, function(err, match) {
-                    if(err) return res.send(err);
-
-                    User.findOne({_id : req.params.userID}).exec(function(err, user) {
+// Function for starting conversation(s) (right now it's just making all of them)
+function startConversation(match)
+{
+    Match.find({ ted: match.robin, robin: match.robin, preference: true }).exec(function(err, matches) {
+        matches.forEach(function(temp) {
+            Conversation.findOne({ participants: {$all : [ temp.barney, match.barney ]}}).exec(function(err, conversation) {
+                if (err) return res.send(err);
+                if (!conversation)
+                {
+                    Conversation.create({
+                        participants: [ temp.barney, match.barney ]
+                    }, function(err, conversation) {
                         if (err) return res.send(err);
-
-                        user.profile.matches.push(match);
-                        user.save();
-
-                        return res.json(match);
                     });
-                });
+                }
+            });
+        });
+    });
+}
+
+router.route("/:ted/:barney/:robin")
+    .post(function(req, res, next) {
+        Match.findOne({ ted : req.params.ted, barney : req.params.barney, robin: req.params.robin }).exec(function(err, match) {
+            if(err) return res.send(err);
+            if(match)
+            {
+                match.preference = req.body.preference;
+                match.save();
+                if (match.preference)
+                    startConversation(match);
+                return res.json(match);
             }
+
+            Match.create({
+                ted: req.params.ted,
+                barney: req.params.barney,
+                robin: req.params.robin,
+                preference: req.body.preference
+            }, function(err, match) {
+                if (err) return res.send(err);
+                if(match.preference)
+                    startConversation(match);
+                return res.json(match);
+            });
         });
     });
 
