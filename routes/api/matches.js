@@ -47,19 +47,25 @@ router.route("/:ted/:barney")
 
 
 // Function for starting conversation(s) (right now it's just making all of them)
-function startConversation(match)
+function startConversation(match, res)
 {
-    Match.find({ ted: match.robin, robin: match.robin, preference: true }).exec(function(err, matches) {
+    Match.find({ robin: match.ted, ted: match.robin, preference: true }).exec(function(err, matches) {
+        if(matches == null || matches.length == 0) {
+            return res.json(null);
+        }
         matches.forEach(function(temp) {
             Conversation.findOne({ participants: {$all : [ temp.barney, match.barney ]}}).exec(function(err, conversation) {
                 if (err) return res.send(err);
                 if (!conversation)
                 {
                     Conversation.create({
-                        participants: [ temp.barney, match.barney ]
+                        participants: [ match.barney, temp.barney ]
                     }, function(err, conversation) {
                         if (err) return res.send(err);
+                        return res.json(conversation);
                     });
+                } else {
+                    return res.json(conversation);
                 }
             });
         });
@@ -109,9 +115,12 @@ router.route("/:ted/:barney/:robin")
                 preference: req.body.preference
             }, function(err, match) {
                 if (err) return res.send(err);
-                if(match.preference)
-                    startConversation(match);
-                return res.json(match);
+                console.log(match);
+                if(match.preference) {
+                    startConversation(match, res);
+                } else {
+                    return res.json(match);
+                }
             });
         });
     });
