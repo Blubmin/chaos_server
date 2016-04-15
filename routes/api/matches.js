@@ -59,13 +59,21 @@ function startConversation(match, res)
                 if (!conversation)
                 {
                     Conversation.create({
-                        participants: [ match.barney, temp.barney ]
+                        participants: [ match.barney, temp.barney ],
                     }, function(err, conversation) {
                         if (err) return res.send(err);
-                        return res.json(conversation);
+                        return res.json({
+                            "result" : 1,
+                            "match" : match,
+                            "conversation" : conversation
+                        });
                     });
                 } else {
-                    return res.json(conversation);
+                    return res.json({
+                        "result" : 2,
+                        "match" : match,
+                        "conversation" : conversation
+                    });
                 }
             });
         });
@@ -119,7 +127,10 @@ router.route("/:ted/:barney/:robin")
                 if(match.preference) {
                     startConversation(match, res);
                 } else {
-                    return res.json(match);
+                    return res.json({
+                        "result" : 0,
+                        "match" : match
+                    });
                 }
             });
         });
