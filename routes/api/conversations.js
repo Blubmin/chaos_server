@@ -24,6 +24,13 @@ router.route('/')
         })
     })
 
+router.route("/deleteAllMessages")
+    .get(function(req, res) {
+        Conversation.remove({}, function(err) {
+            res.send("Done");
+        })
+    })
+
 router.route("/:id/messages")
     .get(function(req, res, next) {
         Conversation.getMessagesByConvoID(req.params.id, function(err, messages) {

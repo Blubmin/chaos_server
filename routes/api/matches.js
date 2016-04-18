@@ -80,6 +80,13 @@ function startConversation(match, res)
     });
 }
 
+router.route("/deleteAll")
+    .get(function(req, res) {
+        Match.remove({}, function(err) {
+            res.send("Done");
+        })
+    })
+
 router.route("/:ted/:barney/:robin")
     .post(function(req, res, next) {
         Match.findOne({ ted : req.params.ted, barney : req.params.barney, robin: req.params.robin }).exec(function(err, match) {
