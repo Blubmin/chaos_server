@@ -42,9 +42,9 @@ router.route("/:id/messages")
         var message = req.body.message;
         var userID = req.body.userID;
         Conversation.findOne({"_id" : req.params.id}, function(err, convo) {
-            convo.addMessage(message, userID, function(err2) {
+            convo.addMessage(message, userID, function(err2, theMessage) {
                 if(err2) return res.send(err2);
-                return res.json({"result" : "message added"});
+                return res.json(theMessage);
             })
         })
 

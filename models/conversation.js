@@ -30,7 +30,9 @@ conversationSchema.methods.addMessage = function(message, userID, cb) {
         user : userID,
         message : message
     });
-    this.save(cb);
+    this.save(function(err, convo) {
+        return cb(convo.messages[convo.messages.length - 1])
+    });
 }
 
 var Conversation = mongoose.model('Conversation', conversationSchema);
