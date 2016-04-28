@@ -9,6 +9,8 @@ var Match = require(root("models/match")),
     User = require(root("models/user")),
     Conversation  = require(root("models/conversation"));
 
+var notifications = require("./notifications");
+
 router.route("/")
     .get(function(req, res, next) {
         console.log("retrieving matches...");
@@ -45,7 +47,6 @@ router.route("/:ted/:barney")
         })
     });
 
-
 // Function for starting conversation(s) (right now it's just making all of them)
 function startConversation(match, res)
 {
@@ -54,14 +55,28 @@ function startConversation(match, res)
             return res.json(null);
         }
         matches.forEach(function(temp) {
+
+
             Conversation.findOne({ participants: {$all : [ temp.barney, match.barney ]}}).exec(function(err, conversation) {
                 if (err) return res.send(err);
                 if (!conversation)
                 {
                     Conversation.create({
-                        participants: [ match.barney, temp.barney ],
+                        participants: [ match.barney, temp.barney ]
                     }, function(err, conversation) {
                         if (err) return res.send(err);
+
+                        // Sends a notification to the person who didn't just swipe
+                        User.findOne({_id: temp.ted}).exec(function(err, ted) {
+                            if (err) console.log(err);
+                            User.findOne({_id: temp.barney}).exec(function(err, barney) {
+                                if (err) conosle.log(err);
+                                notifications.sendMatchNotification(ted.profile.first_name, conversation._id, barney.gcmId, function(err, res) {
+                                    console.log("Notification send to: " + barney._id);
+                                });
+                            });
+                        });
+
                         return res.json({
                             "result" : 1,
                             "match" : match,
@@ -95,7 +110,7 @@ router.route("/:ted/:barney/:robin")
             {
                 match.preference = req.body.preference;
                 match.save(function(err) {
-                    if (err) return ses.send(err);
+                    if (err) return res.send(err);
                 });
 
                 User.findOne({_id : req.params.userID}).exec(function(err, user) {
@@ -130,7 +145,6 @@ router.route("/:ted/:barney/:robin")
                 preference: req.body.preference
             }, function(err, match) {
                 if (err) return res.send(err);
-                console.log(match);
                 if(match.preference) {
                     startConversation(match, res);
                 } else {

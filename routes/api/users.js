@@ -107,4 +107,17 @@ router.route("/:id/matches")
         })
     });
 
+router.route("/:id/gcmId")
+    .put(function(req, res, next) {
+        User.findById(req.params.id, function(err, user) {
+            if (err) return res.status(400).send(err);
+            if (!user) return res.status(400).send("No user found.");
+            user.gcmId = req.body.gcmId;
+            user.save(function(err) {
+                if (err) return res.status(400).send(err);
+                return res.json(user);
+            });
+        });
+    });
+
 module.exports = router;
