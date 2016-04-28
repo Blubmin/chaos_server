@@ -62,7 +62,14 @@ function startConversation(match, res)
                 if (!conversation)
                 {
                     Conversation.create({
-                        participants: [ match.barney, temp.barney ]
+                        robins : [{
+                            barney : temp.barney,
+                            robin : temp.robin
+                        }, {
+                            barney : match.barney,
+                            robin : match.robin
+                        }],
+                        participants: [ match.barney, temp.barney ],
                     }, function(err, conversation) {
                         if (err) return res.send(err);
 

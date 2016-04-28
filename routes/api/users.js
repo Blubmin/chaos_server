@@ -20,7 +20,8 @@ router.route("/")
         User.create({
             facebook_id : req.body.facebook_id,
             email: req.body.email,
-            profile : req.body.profile
+            profile : req.body.profile,
+            birthday : req.body.birthday
         }, function (err, user) {
             if(err) return res.send(err);
             return res.json(user);
@@ -32,6 +33,14 @@ router.route("/")
             res.send("Removed");
         })
     });
+
+router.route("/id/:id")
+    .get(function(req, res) {
+        User.findOne({"_id" : req.params.id}, function(err, user) {
+            if(err) return res.send(err);
+            return res.json(user);
+        })
+    })
 
 
 router.route("/:id")

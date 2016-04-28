@@ -15,6 +15,7 @@ var userSchema = new Schema({
         last_name : String,
         description: String,
         age: Schema.Types.Number,
+        birthday : String,
         gender: { type: String, enum: ["male", "female"]},
         photos: [{ type: String }],
         wingmen: [{type: Schema.Types.ObjectId, ref: 'User'}]
