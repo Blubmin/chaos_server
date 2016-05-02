@@ -102,6 +102,35 @@ router.route("/:id/photos")
         })
     });
 
+router.route("/:id/photos/:index")
+    .post(function(req, res, next) {
+        User.findById(req.params.id, function(err, user) {
+            if (err) return res.send(err);
+            if(req.params.index >= user.profile.photos.length) {
+                user.profile.photos.push(req.body.photo)
+            } else {
+                user.profile.photos[req.params.index] = req.body.photo;
+            }
+            user.save(function(err) {
+                if (err) return res.send(err);
+                return res.json(user);
+            });
+        })
+    })
+    .delete(function(req, res) {
+        User.findById(req.params.id, function(err, user) {
+            if (err) return res.send(err);
+            if(req.params.index >= user.profile.photos.length) {
+                return res.send("Error");
+            }
+            user.profile.photos.splice(req.params.index, 1);
+            user.save(function(err) {
+                if (err) return res.send(err);
+                return res.json(user);
+            });
+        })
+    });
+
 // for testing, mainly
 router.route("/:id/matches")
     .delete(function(req, res, next) {
