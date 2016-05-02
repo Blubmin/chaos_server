@@ -51,6 +51,14 @@ router.route("/:id/messages")
 
     })
 
+router.route("/:id/messages/:limit")
+    .get(function(req, res) {
+        Conversation.getMessagesByConvoIDLimit(req.params.id, req.params.limit, function(err, messages) {
+            if(err) return res.send(err);
+            return res.json(messages);
+        })
+    })
+
 router.route("/:userID")
     .get(function(req, res, next) {
         Conversation.getConversationByUser(req.params.userID, function(err, convos) {
