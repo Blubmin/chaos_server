@@ -23,7 +23,7 @@ router.route("/")
 
 // Gets a random unmatched user
 router.route("/:ted/:barney")
-    .get(function(req, res, next) {
+    .post(function(req, res, next) {
         Match.find({ ted: req.params.ted, barney: req.params.barney }).exec(function(err, matches) {
             if(err) return res.send(err);
 
@@ -34,9 +34,12 @@ router.route("/:ted/:barney")
             robins.push(req.params.barney);
             robins.push(req.params.ted);
 
-            User.findRandom({ _id : { $nin : robins}}, {}, {limit : 1}).exec(function(err, unmatchedUser) {
+            var limit = req.body.limit ? req.body.limit : 1;
+            var exclude = req.body.exclude ? req.body.exclude : [];
+
+            User.findRandom({$and:[{ _id : { $nin : robins}}, {_id : {$nin : exclude}}]}, {}, {limit : limit}).exec(function(err, unmatchedUsers) {
                 if (err) return res.send(err);
-                res.json(unmatchedUser[0]);
+                res.json(unmatchedUsers);
             });
         });
     })
