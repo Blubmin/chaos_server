@@ -47,7 +47,7 @@ router.route("/:id")
     .get(function(req, res, next) {
         User.findOne({facebook_id : req.params.id}, function(err, user) {
             if(err) return res.send(err);
-            return res.json(user)
+            return res.json(user.toJSON());
         })
     })
     .put(function(req, res, next) {
@@ -121,7 +121,7 @@ router.route("/:id/photos/:index")
         User.findById(req.params.id, function(err, user) {
             if (err) return res.send(err);
             if(req.params.index >= user.profile.photos.length) {
-                return res.send("Error");
+                return res.json(user);
             }
             user.profile.photos.splice(req.params.index, 1);
             user.save(function(err) {

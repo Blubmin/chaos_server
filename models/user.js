@@ -24,6 +24,12 @@ var userSchema = new Schema({
 // Adds in the ability to query for a random profile
 userSchema.plugin(random, {path: 'r'});
 
+userSchema.virtual("age").get(function() {
+    return (Date.now() - Date.parse(this.birthday)) / 31556952000;
+})
+
+userSchema.set('toJSON', { getters: true, virtuals: true });
+
 var User = mongoose.model('User', userSchema);
 
 module.exports = User;
