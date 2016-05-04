@@ -47,7 +47,7 @@ router.route("/:id")
     .get(function(req, res, next) {
         User.findOne({facebook_id : req.params.id}, function(err, user) {
             if(err) return res.send(err);
-            return res.json(user.toJSON());
+            return res.json(user);
         })
     })
     .put(function(req, res, next) {
