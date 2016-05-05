@@ -21,7 +21,12 @@ router.route("/")
             facebook_id : req.body.facebook_id,
             email: req.body.email,
             profile : req.body.profile,
-            birthday : req.body.birthday
+            birthday : req.body.birthday,
+            'discovery_settings.age_upper' : req.body.discovery_settings.age_upper,
+            'discovery_settings.age_lower' : req.body.discovery_settings.age_lower,
+            'discovery_settings.distance' : req.body.discovery_settings.distance,
+            'location.coordinates' : [parseFloat(req.body.discovery_settings.longitude),parseFloat(req.body.discovery_settings.latitude)],
+            'discovery_settings.seeking' : req.body.discovery_settings.seeking
         }, function (err, user) {
             if(err) return res.send(err);
             return res.json(user);
@@ -51,7 +56,7 @@ router.route("/:id")
         })
     })
     .put(function(req, res, next) {
-        console.log(req);
+        console.log(req.body);
         User.findOne({facebook_id : req.params.id}, function(err, user) {
             if (err) return res.send(err);
             if (!user) return res.json(user);
@@ -71,6 +76,16 @@ router.route("/:id")
                     user.profile.gender = req.body.profile.gender;
                 if (req.body.profile.photos)
                     user.profile.photos = req.body.profile.photos;
+            }
+            if (req.body.match_limits)
+                user.match_limits = req.body.match_limits;
+            if (req.body.discovery_settings)
+            {
+                user.discovery_settings.age_upper = req.body.discovery_settings.age_upper,
+                user.discovery_settings.age_lower = req.body.discovery_settings.age_lower,
+                user.discovery_settings.distance = req.body.discovery_settings.distance,
+                user.location.coordinates = [parseFloat(req.body.discovery_settings.longitude),parseFloat(req.body.discovery_settings.latitude)],
+                user.discovery_settings.seeking = req.body.discovery_settings.seeking
             }
 
             user.save(function(err) {

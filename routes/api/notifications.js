@@ -9,7 +9,7 @@ var config = require('config'),
 
 exports.sendMatchNotification = function(ted_name, conversation_id, to, cb) {
     var message = ted_name + " has a new match!";
-    this.send(message, to, false, 1, {type: 'match', conversation_id: conversation_id}, function(err, res) {
+    this.send(message, to, true, 1, {type: 'match', conversation_id: conversation_id}, function(err, res) {
         cb(err, res);
     })
 }
