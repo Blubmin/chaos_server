@@ -14,10 +14,9 @@ var userSchema = new Schema({
         first_name: String,
         last_name: String,
         description: String,
-        age: Schema.Types.Number,
-        birthday: String,
-        gender: {type: String, enum: ["male", "female"]},
-        photos: [{type: String}],
+        birthday : String,
+        gender: { type: String, enum: ["male", "female"]},
+        photos: [{ type: String }],
         wingmen: [{type: Schema.Types.ObjectId, ref: 'User'}]
     },
     match_limits: [{
@@ -28,6 +27,12 @@ var userSchema = new Schema({
 });
 // Adds in the ability to query for a random profile
 userSchema.plugin(random, {path: 'r'});
+
+userSchema.virtual("profile.age").get(function() {
+    return Math.floor((Date.now() - Date.parse(this.profile.birthday)) / 31556952000);
+})
+
+userSchema.set('toJSON', { getters: true, virtuals: true });
 
 var User = mongoose.model('User', userSchema);
 

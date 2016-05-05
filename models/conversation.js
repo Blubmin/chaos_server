@@ -16,7 +16,7 @@ var conversationSchema = new Schema({
     messages : [{
         user : { type: Schema.Types.ObjectId, ref: 'User' },
         message : String,
-        time : {type: Date, default : Date.now()}
+        time : Date
     }],
     last_updated : {type : Date, default : Date.now()}
 });
@@ -35,10 +35,22 @@ conversationSchema.statics.getMessagesByConvoID = function(convoID, cb) {
     return this.findOne({"_id" : convoID}).populate("messages.user", "profile.first_name profile.last_name profile.photos").select("messages").sort({time : 1}).exec(cb);
 }
 
+conversationSchema.statics.getMessagesByConvoIDLimit = function(convoID, limit, cb) {
+    return this.findOne({"_id" : convoID}).populate("messages.user", "profile.first_name profile.last_name profile.photos").select("messages").exec(function(err, message) {
+        //var message = message.toObject();
+        message.messages.sort(function(a, b) {
+            return a.time - b.time;
+        })
+        message.messages.splice(0, message.messages.length-limit);
+        return cb(err, message);
+    });
+}
+
 conversationSchema.methods.addMessage = function(message, userID, cb) {
     this.messages.push({
         user : userID,
-        message : message
+        message : message,
+        time : Date.now()
     });
     this.save(function(err, convo) {
         return cb(convo.messages[convo.messages.length - 1])
