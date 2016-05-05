@@ -11,6 +11,10 @@ var Match = require(root("models/match")),
 
 var notifications = require("./notifications");
 
+var config = require('config');
+
+var match_limit = config.get("matchLimit");
+
 router.route("/")
     .get(function(req, res, next) {
         console.log("retrieving matches...");
@@ -34,7 +38,7 @@ router.route("/:ted/:barney")
             robins.push(req.params.barney);
             robins.push(req.params.ted);
 
-            var limit = req.body.limit ? req.body.limit : 1;
+            var limit = req.body.limit ? parseInt(req.body.limit) : 1;
             var exclude = req.body.exclude ? req.body.exclude : [];
 
             User.findRandom({$and:[{ _id : { $nin : robins}}, {_id : {$nin : exclude}}]}, {}, {limit : limit}).exec(function(err, unmatchedUsers) {
@@ -105,6 +109,16 @@ function startConversation(match, res)
     });
 }
 
+// TODO: Finish this
+function requestMatches(ted, barney, count)
+{
+    User.find(barney).populate('match_limits').exec(function(err, user) {
+        user.match_limits.forEach(function(match_limit) {
+
+        });
+    });
+}
+
 router.route("/deleteAll")
     .get(function(req, res) {
         Match.remove({}, function(err) {
@@ -116,35 +130,11 @@ router.route("/:ted/:barney/:robin")
     .post(function(req, res, next) {
         Match.findOne({ ted : req.params.ted, barney : req.params.barney, robin: req.params.robin }).exec(function(err, match) {
             if(err) return res.send(err);
-            if(match)
+            if(match) // Shouldn't happen unless debugging
             {
-                match.preference = req.body.preference;
-                match.save(function(err) {
-                    if (err) return res.send(err);
-                });
-
-                User.findOne({_id : req.params.userID}).exec(function(err, user) {
-                    if (err) return res.send(err);
-
-                    user.profile.matches.push(match);
-                    user.save(function(err) {
-                        if (err) return res.send(err);
-                    });
-
-                    if (match.preference1 && match.preference2) {
-
-                        Conversation.findOne({participants : {$all : userIds}}).exec(function(err, conversation) {
-                            if (err) return res.send(err);
-
-                            if (!conversation) {
-                                Conversation.create({
-                                    participants: userIds
-                                });
-                            }
-                        });
-                    }
-
-                    return res.json(match);
+                return res.json({
+                    "result" : 2,
+                    "match" : match
                 });
             }
 
