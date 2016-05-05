@@ -28,7 +28,7 @@ exports.send = function(message, to, hasSound, badge, payload, cb) {
 
     var data = {
         to: to,
-        "content-available": true,
+        content_available: true,
         notification: notification,
         data: payload
     };

@@ -1,4 +1,5 @@
 {
   "gcmKey": "AIzaSyCMhsPSMIF5Kf2ooooHqrXTxtFWRKikqvk",
-  "dbConnection": "mongodb://localhost/chaosdb"
+  "dbConnection": "mongodb://localhost/chaosdb",
+  "matchLimit": 2
 }
