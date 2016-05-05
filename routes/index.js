@@ -5,5 +5,10 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+//
+//router.get('/privacy', function(req, res, next) {
+//  res.render('privacy/index', { title: 'Privcay Policy' });
+//});
+
 
 module.exports = router;
