@@ -9,8 +9,8 @@ var config = require('config'),
 
 exports.sendMatchNotification = function(ted_name, conversation_id, to, cb) {
     var message = ted_name + " has a new match!";
-    this.send(message, to, true, 1, {type: 'match', conversation_id: conversation_id}, function(err, res) {
-        cb(err, res);
+    this.send(message, to, true, 1, {type: 'match', conversation_id: conversation_id}, function(data, status) {
+        cb(data, status);
     })
 }
 
@@ -30,10 +30,13 @@ exports.send = function(message, to, hasSound, badge, payload, cb) {
         to: to,
         content_available: true,
         notification: notification,
-        data: payload
+        data: payload,
+        priority: "high"
     };
 
-    var url = "https://android.googleapis.com/gcm/send";
+    var url = "https://gcm-http.googleapis.com/gcm/send"
+
+    //var url = "https://android.googleapis.com/gcm/send";
 
     ajax.post({
         url: url,
