@@ -14,7 +14,8 @@ mongoose.connect(config.get("dbConnection"));
 var routes = require('./routes/index');
 var users = require('./routes/api/users');
 var matches = require('./routes/api/matches');
-var conversations = require("./routes/api/conversations")
+var conversations = require("./routes/api/conversations");
+var notify = require("./routes/api/notify");
 
 var app = express();
 
@@ -36,6 +37,8 @@ app.use('/sockets', require("./routes/sockets"));
 app.use('/api/users', users);
 app.use('/api/conversations', conversations);
 app.use('/api/matches', matches);
+app.use('/api/notify', notify);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

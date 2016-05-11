@@ -19,19 +19,25 @@ exports.send = function(message, to, hasSound, badge, payload, cb) {
         Authorization: "key=" + gcmKey,
         "Content-Type": "application/json"
     };
-
-    var notification = {
-        body: message,
-        sound: hasSound ? 'default' : '',
-        badge: badge
-    };
+    var notification = {}
+    if(badge == null) {
+        notification = {
+            body: message,
+            sound: hasSound ? 'default' : ''
+        };
+    } else {
+        notification = {
+            body: message,
+            sound: hasSound ? 'default' : '',
+            badge: badge
+        };
+    }
 
     var data = {
         to: to,
         content_available: true,
         notification: notification,
-        data: payload,
-        priority: "high"
+        data: payload
     };
 
     var url = "https://gcm-http.googleapis.com/gcm/send"

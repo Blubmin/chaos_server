@@ -8,13 +8,6 @@ var express = require("express"),
 var User = require(root("models/user"));
 var notifications = require("./notifications");
 
-router.route("/notify")
-    .get(function(req, res) {
-        notifications.sendMatchNotification("", "100","kolNnr-8nzs:APA91bG1p4cq5DrRsG1z-6_Du1JiOZ7Qo0RkUGbcw81fZicIVmH6FHbf-FI55PKeDBm-iZftrVWLzk5ONjmCqtX4DSXxmTuCL0kQ8djIv-y5b2K57h4m-1eMHj6-W-jLj1NruhEzDTqd", function(data, status) {
-            res.json(status.headers);
-        })
-    })
-
 /* GET home page. */
 router.route("/")
     .get(function(req, res, next) {
