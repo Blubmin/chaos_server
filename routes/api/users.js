@@ -27,7 +27,7 @@ router.route("/")
             'discovery_settings.age_lower' : req.body.discovery_settings.age_lower,
             'discovery_settings.distance' : req.body.discovery_settings.distance,
             'location.coordinates' : [parseFloat(req.body.discovery_settings.longitude),parseFloat(req.body.discovery_settings.latitude)],
-            'discovery_settings.seeking' : "both"/*req.body.discovery_settings.seeking*/
+            'discovery_settings.seeking' : req.body.discovery_settings.seeking
         }, function (err, user) {
             if(err) return res.send(err);
             return res.json(user);
