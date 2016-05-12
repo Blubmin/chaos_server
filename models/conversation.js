@@ -53,7 +53,7 @@ conversationSchema.methods.addMessage = function(message, userID, cb) {
         time : Date.now()
     });
     this.save(function(err, convo) {
-        return cb(convo.messages[convo.messages.length - 1])
+        return cb(err, convo.messages[convo.messages.length - 1])
     });
 }
 

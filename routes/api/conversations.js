@@ -4,9 +4,14 @@
 
 
 var express = require("express"),
-    router = express.Router()
+    router = express.Router(),
+    root = require("root-path"),
     Conversation = require("../../models/conversation");
 ;
+
+var notifications = require("./notifications");
+
+var User = require(root("models/user"));
 
 router.route('/')
     .get(function(req, res, next) {
@@ -45,6 +50,17 @@ router.route("/:id/messages")
         Conversation.findOne({"_id" : req.params.id}, function(err, convo) {
             convo.addMessage(message, userID, function(err2, theMessage) {
                 if(err2) return res.send(err2);
+                var sendMessageToUserId = "";
+                if(convo.participants[0] != userID) {
+                    sendMessageToUserId = convo.participants[0];
+                } else if(convo.participants[0] == userID) {
+                    sendMessageToUserId = convo.participants[1];
+                }
+                User.findOne({"_id" : sendMessageToUserId}, function(err, user) {
+                    notifications.send("You got a new message!", user.gcmId, true, 1, {type: 'message', conversation_id: req.params.id}, function() {
+
+                    })
+                })
                 return res.json(theMessage);
             })
         })
