@@ -48,6 +48,14 @@ router.route("/id/:id")
         })
     })
 
+router.route("/id/:id/profilePic")
+    .get(function(req, res) {
+        User.findOne({"_id" : req.params.id}, function(err, user) {
+            return res.json({"url" : user.getProfPic()});
+        })
+    })
+
+
 
 router.route("/:id")
     .get(function(req, res, next) {

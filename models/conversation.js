@@ -18,17 +18,30 @@ var conversationSchema = new Schema({
         message : String,
         time : Date
     }],
+    unread : [{
+        user : { type: Schema.Types.ObjectId, ref: 'User' },
+        unread : Boolean
+    }],
     last_updated : {type : Date, default : Date.now()}
 });
 
 conversationSchema.statics.getConversationByUser = function(userID, cb) {
-    return this.find({}).select({participants : 1, last_updated : 1, robins : 1, messages : {"$slice" : -1}})
+    return this.find({}).select({participants : 1, last_updated : 1, robins : 1, unread : 1, messages : {"$slice" : -1}})
         .where("participants").in([userID]).sort({last_updated : 1})
         .populate("participants", "profile.first_name profile.photos")
         .populate("robins.robin", "profile.first_name profile.photos")
         .exec(function(err, convos) {
             return cb(err, convos);
     });
+}
+
+conversationSchema.methods.markAsRead = function(userID, cb) {
+    for(var i = 0; i < this.unread; i++) {
+        if(this.unread[i].user == userID) {
+            this.unread[i].unread = false;
+            return this.save(cb);
+        }
+    }
 }
 
 conversationSchema.statics.getMessagesByConvoID = function(convoID, cb) {
@@ -47,11 +60,13 @@ conversationSchema.statics.getMessagesByConvoIDLimit = function(convoID, limit, 
 }
 
 conversationSchema.methods.addMessage = function(message, userID, cb) {
+    var time = Date.now();
     this.messages.push({
         user : userID,
         message : message,
-        time : Date.now()
+        time : time
     });
+    this.last_updated = time;
     this.save(function(err, convo) {
         return cb(err, convo.messages[convo.messages.length - 1])
     });

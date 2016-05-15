@@ -19,8 +19,10 @@ io.on('connection', function (socket) {
         socket.join(data.room);
     })
 
-    socket.on('my other event', function (data) {
+    socket.on('start-typing', function (data, fn) {
+        io.to(data.room).emit("start-typing", {user : data.user, typing: data.typing});
         console.log(data);
+
     });
 });
 

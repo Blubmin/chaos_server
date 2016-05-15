@@ -42,6 +42,10 @@ userSchema.index({location: '2dsphere'});
 // Adds in the ability to query for a random profile
 userSchema.plugin(random, {path: 'r'});
 
+userSchema.methods.getProfPic = function() {
+    return this.profile.photos[0];
+}
+
 userSchema.virtual("profile.age").get(function() {
     return Math.floor((Date.now() - Date.parse(this.profile.birthday)) / 31556952000);
 });

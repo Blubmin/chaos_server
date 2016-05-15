@@ -29,10 +29,44 @@ router.route('/')
         })
     })
 
-router.route("/deleteAllMessages")
+
+router.route("/:id/read/:userID")
     .get(function(req, res) {
-        Conversation.remove({}, function(err) {
-            res.send("Done");
+        Conversation.findOne({_id : req.params.id}, function(err, convo) {
+            convo.unread.forEach(function(unreadObj) {
+                if(unreadObj.user == req.params.userID) {
+                    unreadObj.unread = false;
+                }
+            })
+            convo.save(function(err) {
+                res.send("Done");
+            })
+
+            //convo.markAsRead(req.params.userID, function(err) {
+            //
+            //    res.send("Done");
+            //})
+        })
+    })
+
+router.route("/:id/messages/update")
+    .get(function(req, res) {
+        Conversation.find({}, function(err, convos) {
+            convos.forEach(function(convo) {
+                convo.unread = [
+                    {
+                        user : convo.participants[0],
+                        unread : false
+                    },
+                    {
+                        user : convo.participants[1],
+                        unread : false
+                    }
+                ]
+                convo.save(function(err) {
+                    res.send(err);
+                })
+            })
         })
     })
 
