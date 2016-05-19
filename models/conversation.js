@@ -67,6 +67,11 @@ conversationSchema.methods.addMessage = function(message, userID, cb) {
         time : time
     });
     this.last_updated = time;
+    this.unread.forEach(function(unread) {
+        if(unread.user != userID) {
+            unread.unread = true;
+        }
+    })
     this.save(function(err, convo) {
         return cb(err, convo.messages[convo.messages.length - 1])
     });

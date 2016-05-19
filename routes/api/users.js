@@ -182,4 +182,15 @@ router.route("/:id/gcmId")
         });
     });
 
+router.route("/friends")
+    .post(function(req, res) {
+        User.find({
+            facebook_id : {
+                $in : req.body.facebookIds
+            }
+        }, function(err, users) {
+            res.json(users);
+        })
+    })
+
 module.exports = router;
