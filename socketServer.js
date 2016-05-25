@@ -19,7 +19,7 @@ io.on('connection', function (socket) {
         socket.join(data.room);
     })
 
-    socket.on('start-typing', function (data, fn) {
+    socket.on('start-typing', function (data) {
         io.to(data.room).emit("start-typing", {user : data.user, typing: data.typing});
         console.log(data);
 

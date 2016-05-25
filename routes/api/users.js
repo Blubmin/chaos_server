@@ -184,9 +184,13 @@ router.route("/:id/gcmId")
 
 router.route("/friends")
     .post(function(req, res) {
+        var ids = []
+        req.body.facebookIds.forEach(function(id) {
+            ids.push(parseInt(id));
+        })
         User.find({
             facebook_id : {
-                $in : req.body.facebookIds
+                $in : ids
             }
         }, function(err, users) {
             res.json(users);
