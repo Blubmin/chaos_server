@@ -173,4 +173,78 @@ router.route("/:id/gcmId")
         });
     });
 
+router.route("/:barney/request/:ted")
+    .post(function(req, res, next) {
+        User.findById(req.params.ted, function(err, ted) {
+            if (err) return res.send(err);
+
+            User.findById(req.params.barney, function(err, barney) {
+                if (err) return res.send(err);
+
+                if (ted.approved_wingmen.indexOf(barney.id) != -1) {
+                    return res.json({
+                        approved: true
+                    });
+                }
+
+                if (ted.pending_wingmen.indexOf(barney.id) != -1) {
+                    return res.json({
+                        approved: false
+                    });
+                }
+
+                ted.pending_wingmen.push(barney.id);
+                ted.save(function(err) {
+                    if (err) return res.send(err);
+
+                    notification.sendWingmanRequestNotification(barney.profile.first_name , barney.id, ted.gcmId, function(err, res) {
+
+                        return res.json({
+                            notificaiton: err != null ? err : res,
+                            approved: false
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+router.route("/:ted/approve/:barney")
+    .post(function(req, res, next) {
+        User.findById(req.params.ted, function(err, ted) {
+            if (err) return res.send(err);
+
+            User.findById(req.params.barney, function (err, barney) {
+                if (err) return res.send(err);
+
+                if (ted.approved_wingmen.indexOf(barney.id) != -1) {
+                    return res.json({
+                        approved: true
+                    });
+                }
+
+                if (ted.pending_wingmen.indexOf(barney.id) == -1) { // TODO: Desired functionality? Not allowing for pre-approval; user must first request approval
+                    return res.json({
+                        approved: false
+                    });
+                }
+
+                ted.pending_wingmen.splice(ted.pending_wingmen.indexOf(barney.id), 1);
+                ted.approved_wingmen.push(barney.id);
+
+                ted.save(function(err) {
+                    if (err) return res.send(err);
+
+                    notification.sendApproveWingmanNotification(ted.profile.first_name, ted.id, barney.gcmId, function(err, res) {
+
+                        return res.json({
+                            notificaiton: err != null ? err : res,
+                            approved: true
+                        });
+                    });
+                });
+            });
+        });
+    });
+
 module.exports = router;

@@ -17,8 +17,7 @@ var userSchema = new Schema({
         description: String,
         birthday : { type: String, default: '1994-01-01' },
         gender: { type: String, enum: ["male", "female"]},
-        photos: [{ type: String }],
-        wingmen: [{type: Schema.Types.ObjectId, ref: 'User'}]
+        photos: [{ type: String }]
     },
     match_limits: [{
         ted: String,
@@ -34,7 +33,9 @@ var userSchema = new Schema({
     location: {
         type: {type: String, default: 'Point'},
         coordinates: {type: [Number]}
-    }
+    },
+    approved_wingmen: [{ type: Schema.Types.ObjectId }],
+    pending_wingmen: [{ type: Schema.Types.ObjectId }]
 });
 
 userSchema.index({location: '2dsphere'});

@@ -42,6 +42,9 @@ router.route("/:ted/:barney")
             var limit = req.body.limit ? parseInt(req.body.limit) : 1;
             var exclude = req.body.exclude ? req.body.exclude : [];
 
+            console.log(req.body.exclude);
+            console.log(exclude);
+
             requestMatches(req.params.ted, req.params.barney, limit, function(limit) {
                 if (limit == -1) return res.send("Error: getting match limit");
                 if (limit == 0) return res.json([]);
