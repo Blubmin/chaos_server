@@ -40,7 +40,8 @@ router.route("/:ted/:barney")
             robins.push(req.params.ted);
 
             var limit = req.body.limit ? parseInt(req.body.limit) : 1;
-            var exclude = req.body.exclude ? req.body.exclude : [];
+            var exclude = req.body.exclude ? req.body.exclude :
+                req.body["exclude[]"] ? req.body["exclude[]"] : [];
 
             requestMatches(req.params.ted, req.params.barney, limit, function(limit) {
                 if (limit == -1) return res.send("Error: getting match limit");
