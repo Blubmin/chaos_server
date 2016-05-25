@@ -90,11 +90,12 @@ router.route("/:id")
                 user.match_limits = req.body.match_limits;
             if (req.body.discovery_settings)
             {
-                user.discovery_settings.age_upper = req.body.discovery_settings.age_upper,
-                user.discovery_settings.age_lower = req.body.discovery_settings.age_lower,
-                user.discovery_settings.distance = req.body.discovery_settings.distance,
-                user.location.coordinates = [parseFloat(req.body.discovery_settings.longitude),parseFloat(req.body.discovery_settings.latitude)],
-                user.discovery_settings.seeking = req.body.discovery_settings.seeking
+                user.discovery_settings.age_upper = req.body.discovery_settings.age_upper;
+                user.discovery_settings.age_lower = req.body.discovery_settings.age_lower;
+                user.discovery_settings.distance = req.body.discovery_settings.distance;
+                user.location.coordinates = [parseFloat(req.body.discovery_settings.longitude),parseFloat(req.body.discovery_settings.latitude)];
+                user.discovery_settings.seeking = req.body.discovery_settings.seeking;
+                user.discovery_settings.public_profile = req.body.discovery_settings.public_profile;
             }
 
             user.save(function(err) {

@@ -58,7 +58,9 @@ router.route("/:ted/:barney")
                         ],
                         'profile.gender' : {
                             $in : seeking
-                        }//,
+                        },
+                        "discovery_settings.public_profile" : true
+                        //,
                         //$nearSphere: {
                         //    $geometry: ted_user.discovery_settings.location,
                         //    $maxDistance: ted_user.discovery_settings.distance * 1600 // miles to meters

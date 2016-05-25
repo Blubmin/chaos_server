@@ -29,7 +29,8 @@ var userSchema = new Schema({
         age_lower: {type: Schema.Types.Number, default: 18},
         age_upper: {type: Schema.Types.Number, default: 100},
         distance: {type: Schema.Types.Number, default: 1},
-        seeking: {type: String, enum: ["male", "female", "both"], default: "both"}
+        seeking: {type: String, enum: ["male", "female", "both"], default: "both"},
+        public_profile : {type : Boolean, default : true}
     },
     location: {
         type: {type: String, default: 'Point'},
