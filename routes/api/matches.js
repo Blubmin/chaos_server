@@ -117,6 +117,16 @@ function startConversation(match, res)
                             robin : match.robin
                         }],
                         participants: [ match.barney, temp.barney ],
+                        unread : [
+                            {
+                                user : match.barney,
+                                unread : false
+                            },
+                            {
+                                user : temp.barney,
+                                unread : false
+                            }
+                        ]
                     }, function(err, conversation) {
                         if (err) return res.send(err);
 
