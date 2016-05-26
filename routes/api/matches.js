@@ -135,11 +135,22 @@ function startConversation(match, res)
                             if (err) console.log(err);
                             User.findOne({_id: temp.barney}).exec(function(err, barney) {
                                 if (err) conosle.log(err);
+                                notifications.send(barney.profile.first_name + " just got a match for you!", ted.gcmId, function(err, res) {
+                                    console.log("Notification send to: " + ted._id);
+                                });
                                 notifications.sendMatchNotification(ted.profile.first_name, conversation._id, barney.gcmId, function(err, res) {
                                     console.log("Notification send to: " + barney._id);
                                 });
                             });
                         });
+
+                        User.findOne({_id : match.ted}, function(err, ted) {
+                            User.findOne({_id : match.barney}, function(err2, barney) {
+                                notifications.send(barney.profile.first_name + " just got a match for you!", ted.gcmId, function(err, res) {
+                                    console.log("Notification send to: " + ted._id);
+                                });
+                            })
+                        })
 
                         return res.json({
                             "result" : 1,

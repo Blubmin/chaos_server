@@ -29,26 +29,29 @@ router.route("/")
 
 router.route("/topic")
     .post(function(req, res) {
-        var headers = {
-            Authorization: "key=" + gcmKey,
-            "Content-Type": "application/json"
-        };
-        var url = "https://gcm-http.googleapis.com/gcm/send"
+        notifications.send(req.body.message, req.body.to, true, null, {},  function(data, status) {
+            res.send("Sent: " + req.body.message);
+        })
+        //var headers = {
+        //    Authorization: "key=" + gcmKey,
+        //    "Content-Type": "application/json"
+        //};
+        //var url = "https://gcm-http.googleapis.com/gcm/send"
 
         //var url = "https://android.googleapis.com/gcm/send";
 
-        ajax.post({
-            url: url,
-            headers: headers,
-            data: {
-                to: req.body.to,
-                data : {
-                    message: req.body.message
-                }
-            }
-        }, function() {
-            res.send("Sent: " + req.body.message);
-        });
+        //ajax.post({
+        //    url: url,
+        //    headers: headers,
+        //    data: {
+        //        to: req.body.to,
+        //        data : {
+        //            message: req.body.message
+        //        }
+        //    }
+        //}, function() {
+        //    res.send("Sent: " + req.body.message);
+        //});
     })
 
 router.route("/user/:id")
