@@ -26,6 +26,24 @@ router.route("/")
     });
 
 
+router.route("/testing")
+    .get(function(req, res) {
+        User.aggregate([
+            {
+                $match : {
+                    'profile.gender' : {
+                        $in : ["male"]
+                    },
+                    "discovery_settings.public_profile" : true
+                }
+            },{
+                $sample : {size : 5}
+            }]).exec(function(err, users) {
+            if(err) return res.send(err);
+            return res.json(users);
+        })
+    })
+
 // Gets a random unmatched user
 router.route("/:ted/:barney")
     .post(function(req, res, next) {
@@ -67,8 +85,24 @@ router.route("/:ted/:barney")
                         //    $maxDistance: ted_user.discovery_settings.distance * 1600 // miles to meters
                         //}
                     };
-                    User.findRandom(query, {}, {limit : limit}).exec(function(err, unmatchedUsers) {
-                        if (err) return res.send(err);
+                    //User.findRandom(query, {}, {limit : limit}).exec(function(err, unmatchedUsers) {
+                    //    if (err) return res.send(err);
+                    //    return res.json(unmatchedUsers);
+                    //});
+                    User.aggregate([{
+                        $geoNear : {
+                            spherical : true,
+                            near : {type : "Point" , coordinates : ted_user.location.coordinates},
+                            maxDistance : 8000,
+                            distanceField : "calcLocation"
+                            //includeLocs: "location"
+                        }
+                    },{
+                        $match: query
+                    }, {
+                        $sample : {size : limit}
+                    }]).exec(function(err, unmatchedUsers) {
+                        if(err) return res.send(err);
                         return res.json(unmatchedUsers);
                     });
                 });
