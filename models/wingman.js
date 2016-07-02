@@ -12,32 +12,58 @@ var wingmanSchema = new Schema({
     status: {type : String, enum: ["Pending", "Accepted", "Blocked"]}
 });
 
-userSchema.statics.getWingmen = function(tedId, cb) {
+wingmanSchema.statics.getWingmen = function(tedId, cb) {
     return this.find({ted : tedId, status: "Accepted"}).select("barney").populate("barney").exec(function(err, wingmen) {
         return cb(err, wingmen);
     })
 }
 
-userSchema.statics.getWingmaningFor = function(userID, cb) {
+wingmanSchema.statics.getWingmaningFor = function(userID, cb) {
     return this.find({barney : userID, status: "Accepted"}).select("ted").populate("ted").exec(function(err, wingmen) {
+        var wingmanArray = []
+        wingmen.forEach(function(wingman) {
+            wingmanArray.push(wingman.ted);
+        })
+        return cb(err, wingmanArray);
+    })
+}
+
+wingmanSchema.statics.getPending = function(tedId, cb) {
+    return this.find({ted : tedId, status: "Pending"}).populate("barney").select("barney").exec(function(err, wingmen) {
         return cb(err, wingmen);
     })
 }
 
-userSchema.statics.getRequested = function(tedId, cb) {
-    return this.find({barney : tedId, status: "Pending"}).select("ted").populate("ted").exec(function(err, wingmen) {
+wingmanSchema.statics.getRequested = function(userID, cb) { //requests i've made
+    return this.find({barney : userID, status: "Pending"}).populate("ted").select("ted").exec(function(err, wingmen) {
         return cb(err, wingmen);
     })
 }
 
-userSchema.statics.acceptPending = function(userID, tedID, cb) {
+wingmanSchema.statics.acceptPending = function(userID, tedID, cb) {
     return this.findOne({ted : tedID, barney : userID, status: "Pending"}).exec(function(err, wingman) {
         wingman.status = "Accepted";
         return wingman.save(cb);
     })
 }
 
-userSchema.statics.removeWingman = function(userID, barneyID, cb) {
+wingmanSchema.methods.accept = function(cb) {
+    this.status = "Accepted";
+    this.save(cb);
+}
+
+wingmanSchema.statics.request = function(userID, tedID, cb) {
+    var newWingman = new Wingman();
+    newWingman.ted = tedID;
+    newWingman.barney = userID;
+    newWingman.status = "Pending";
+    return newWingman.save(cb);
+}
+
+
+
+
+wingmanSchema.statics.removeWingman = function(userID, barneyID, cb) {
     return this.findOneAndRemove({ted: userID, barney: barneyID}, cb);
 }
 

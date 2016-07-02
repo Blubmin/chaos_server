@@ -15,6 +15,9 @@ var geodist = require("geodist");
 var config = require('config');
 
 var daily_match_limit = config.get("dailyMatchLimit");
+var mongoose = require('mongoose');
+var ObjectId = mongoose.mongo.ObjectId;
+
 
 router.route("/")
     .get(function(req, res, next) {
@@ -52,15 +55,19 @@ router.route("/:ted/:barney")
 
             var robins = [];
             matches.forEach(function(match) {
-                robins.push(match.robin);
+                robins.push(new ObjectId(match.robin));
             });
-            robins.push(req.params.barney);
-            robins.push(req.params.ted);
+            robins.push(new ObjectId(req.params.ted));
+            robins.push(new ObjectId(req.params.barney));
 
             var limit = req.body.limit ? parseInt(req.body.limit) : 1;
             var exclude = req.body.exclude ? req.body.exclude :
                 req.body["exclude[]"] ? req.body["exclude[]"] : [];
-
+            //var exclude = [];
+            //tempExclude.forEach(function(item) {
+            //    exclude.push(new ObjectId(item));
+            //})
+            console.log("Exclude array: " + exclude);
             requestMatches(req.params.ted, req.params.barney, limit, function(limit) {
                 if (limit == -1) return res.send("Error: getting match limit");
                 if (limit == 0) return res.json([]);
@@ -69,33 +76,23 @@ router.route("/:ted/:barney")
 
                     var seeking = ted_user.discovery_settings.seeking == "both" ? ["male", "female"]
                         : [ted_user.discovery_settings.seeking];
-
+                    console.log("Exclude2: " + robins);
                     var query = {
-                        $and: [
-                            {_id : { $nin : robins }},
-                            {_id : { $nin : exclude }},
+                        $and : [
+                            {_id : {$nin : robins}},
+                            {_id : {$nin : exclude}}
                         ],
                         'profile.gender' : {
                             $in : seeking
                         },
                         "discovery_settings.public_profile" : true
-                        //,
-                        //$nearSphere: {
-                        //    $geometry: ted_user.discovery_settings.location,
-                        //    $maxDistance: ted_user.discovery_settings.distance * 1600 // miles to meters
-                        //}
                     };
-                    //User.findRandom(query, {}, {limit : limit}).exec(function(err, unmatchedUsers) {
-                    //    if (err) return res.send(err);
-                    //    return res.json(unmatchedUsers);
-                    //});
                     User.aggregate([{
                         $geoNear : {
                             spherical : true,
                             near : {type : "Point" , coordinates : ted_user.location.coordinates},
-                            maxDistance : 8000,
+                            maxDistance : ted_user.discovery_settings.distance * 1610, // miles to meters
                             distanceField : "calcLocation"
-                            //includeLocs: "location"
                         }
                     },{
                         $match: query

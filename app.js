@@ -14,6 +14,7 @@ mongoose.connect(config.get("dbConnection"));
 var routes = require('./routes/index');
 var users = require('./routes/api/users');
 var matches = require('./routes/api/matches');
+var wingman = require('./routes/api/wingman');
 var conversations = require("./routes/api/conversations");
 var notify = require("./routes/api/notify");
 
@@ -38,7 +39,7 @@ app.use('/api/users', users);
 app.use('/api/conversations', conversations);
 app.use('/api/matches', matches);
 app.use('/api/notify', notify);
-
+app.use('/api/wingman', wingman);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -17,8 +17,7 @@ var userSchema = new Schema({
         description: String,
         birthday : { type: String, default: '1994-01-01' },
         gender: { type: String, enum: ["male", "female"]},
-        photos: [{ type: String }],
-        wingmen: [{type: Schema.Types.ObjectId, ref: 'User'}]
+        photos: [{ type: String }]
     },
     match_limits: [{
         ted: String,
